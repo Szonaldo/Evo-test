@@ -1,27 +1,49 @@
-import java.io.*;
-//TODO: enum for garden cases [clean,road,obstacle, mixed]
+import java.util.*;
+
+
 public class Main {
 
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_RED = "\u001B[31m";
-    /*
-    *  0,1,2,
-    *  3,x,4,
-    *  5,6,7
-    * */
-    public static final int[][] directions = {
-            {-1,-1}, {0,-1}, {1,-1},
-            {-1,0} ,{1,0},
-            {1,1}, {0,1}, {-1,1}
-    };
+    public static final int[][] directions = { {0,-1}, {-1,0} ,{1,0}, {0,1} };
 
+    //graph search, no circle
+    public static boolean explore(char[][] garden, int x, int y, Set<String> visited){
+        boolean rowInBounds = garden.length > x && x <=0;
+        boolean colInBounds = garden[x].length > y && y <=0;
+        if (!rowInBounds || !colInBounds) return false;
+
+        if (garden[x][y] == 'o') return false;
+
+        String visiting = x+","+y;
+        if (visited.contains(visiting)) return false;
+        visited.add(visiting);
+
+        explore(garden, x-1, y, visited);
+        explore(garden, x+1, y, visited);
+        explore(garden, x, y-1, visited);
+        explore(garden, x, y+1, visited);
+
+        return true;
+    }
 
     public static void main(String[] args) {
-        Garden myGarden = new Garden();
-        LawnMower LawnMower = new LawnMower();
-        myGarden.printLayout();
-        System.out.println("test");
+        String[][] garden = {
+            {"g","g","g","g","g"},
+            {"g","g","g","g","g"},
+            {"g","g","g","g","g"},
+            {"g","g","g","g","g"},
+            {"g","g","g","g","g"}
+        };
+        int[] position = {0,0};
+        //TODO make it to a random generated position
+        //TODO real time drawing of the mawing process with sleep()?
+
+
+        LawnMower myLawnMower = new LawnMower();
+        try {
+            myLawnMower.start();
+        }catch (Exception e){
+            System.out.println("sleep exeption");
+        }
+
     }
 }

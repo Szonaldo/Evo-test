@@ -19,7 +19,7 @@ public class LawnMower {
             move();
             updateVisit();
             count++;
-            Thread.sleep(1000);
+            //Thread.sleep(1000);
             System.out.println(count + " position: " + myPosition[0] + "," + myPosition[1]);
         }
 
@@ -45,7 +45,22 @@ public class LawnMower {
 
     }
 
+    private boolean isGoalReached(GardenTileGraphNode goal, GardenTileGraphNode current){
+        return goal.equalString(current.toString());
+    }
+
+    private void resetParentAndVisited(){
+        for (int i = 0; i < nodes.length; i++) {
+            for (int j = 0; j < nodes[i].length; j++) {
+                nodes[i][j].setVisited(false);
+                nodes[i][j].setParent(null);
+            }
+        }
+    }
+
     private LinkedList<int[]> getPath(GardenTileGraphNode goal){
+
+        resetParentAndVisited();
 
         GardenTileGraphNode currentPosition = nodes[myPosition[0]][myPosition[1]];
         LinkedList<int[]> result = new LinkedList<>();
@@ -60,9 +75,30 @@ public class LawnMower {
         currentPosition.setParent(null);
 
         while (queue.size() != 0){
-            GardenTileGraphNode innerTemp = queue.poll();
+            GardenTileGraphNode innerTemp = queue.poll(); // u
             explored.add(innerTemp);
             innerTemp.setVisited(true);
+
+            for (GardenTileGraphNode neighbour : innerTemp.getNeighbours()) {
+                neighbour.setParent(innerTemp);
+                boolean exp = explored.contains(innerTemp);
+                boolean que = queue.contains(innerTemp); //problémás queue
+                boolean vis = innerTemp.isVisited();
+                boolean tmp = neighbour.getParent() == null;
+                if (!vis || !que || !tmp ) {
+                    if (isGoalReached(goal,neighbour)){
+                        end = neighbour;
+                        break;
+                    }
+                    if (neighbour.isPassable()) {
+                        queue.add(neighbour);
+                    }
+                }
+            }
+            if (!queue.isEmpty() && isGoalReached(goal,queue.peekLast())){
+                break;
+            }
+            /*
 
             if (inBoundsLeft(innerTemp.getArray())
                     && !nodes[innerTemp.getX()][innerTemp.getY() - 1].isVisited()
@@ -104,7 +140,7 @@ public class LawnMower {
                     end = nodes[innerTemp.getX() + 1][innerTemp.getY()];
                     break;
                 }
-            }
+            }*/
         }
 
         if (end == null){
@@ -123,12 +159,7 @@ public class LawnMower {
     private void goToNextValidState(int[] goal){
         System.out.println("Entered goToNextValidState()");
         LinkedList<int[]> route = getPath(nodes[goal[0]][goal[1]]);
-        for (int i = 0; i < nodes.length; i++) {
-            for (int j = 0; j < nodes[i].length; j++) {
-                nodes[i][j].setVisited(false);
-                nodes[i][j].setParent(null);
-            }
-        }
+
         assert route != null;
         for (int[] next : route) {
             myPosition = next;
@@ -259,7 +290,15 @@ public class LawnMower {
         nodes = new GardenTileGraphNode[myGarden.length][myGarden[0].length];
         for (int i = 0; i < myGarden.length; i++) {
             for (int j = 0; j < myGarden[i].length; j++) {
-                nodes[i][j] = new GardenTileGraphNode(i,j,0,myGarden[i][j]);
+                nodes[i][j] = new GardenTileGraphNode(i,j,myGarden[i][j]);
+            }
+        }
+        for (int i = 0; i < myGarden.length; i++) {
+            for (int j = 0; j < myGarden[i].length; j++) {
+                if (i > 0) nodes[i-1][j].getNeighbours().add(nodes[i][j]);
+                if (j > 0) nodes[i][j-1].getNeighbours().add(nodes[i][j]);
+                if (j < myGarden[i].length - 2) nodes[i][j+1].getNeighbours().add(nodes[i][j]);
+                if (i < myGarden.length - 2) nodes[i+1][j].getNeighbours().add(nodes[i][j]);
             }
         }
         moveOptions = new LinkedList<>();

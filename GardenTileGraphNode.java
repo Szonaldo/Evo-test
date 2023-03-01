@@ -1,10 +1,21 @@
 import javax.swing.plaf.SplitPaneUI;
+import java.util.ArrayList;
 
 public class GardenTileGraphNode {
     private int x;
     private int y;
     private boolean isVisited;
     private boolean isPassable;
+    private ArrayList<GardenTileGraphNode> neighbours;
+
+    public ArrayList<GardenTileGraphNode> getNeighbours() {
+        return neighbours;
+    }
+
+    public void setNeighbours(ArrayList<GardenTileGraphNode> neighbours) {
+        this.neighbours = neighbours;
+    }
+
     private GardenTileGraphNode parent;
 
     public GardenTileGraphNode(){
@@ -13,6 +24,7 @@ public class GardenTileGraphNode {
         isVisited = false;
         isPassable = true;
         parent = null;
+        neighbours = null;
     }
 
     public GardenTileGraphNode(int x, int y, boolean visited, GardenTileGraphNode parent, String[][] layout){
@@ -38,7 +50,7 @@ public class GardenTileGraphNode {
         this.parent = null;
     }
 
-    public GardenTileGraphNode(int x, int y, int distance, String isPassable){
+    public GardenTileGraphNode(int x, int y, String isPassable){
         this.x = x;
         this.y = y;
         this.isVisited = false;
@@ -48,9 +60,10 @@ public class GardenTileGraphNode {
             this.isPassable = false;
         }
         this.parent = null;
+        this.neighbours = new ArrayList<>();
     }
 
-    public GardenTileGraphNode(int x, int y, int distance, boolean isVisited, String isPassable){
+    public GardenTileGraphNode(int x, int y, boolean isVisited, String isPassable){
         this.x = x;
         this.y = y;
         this.isVisited = isVisited;

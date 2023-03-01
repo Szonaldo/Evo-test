@@ -1,0 +1,11 @@
+set for considered tiles
+routing between current tile and considered tiles
+
+
+state:
+-> search neighbouring tiles
+-> add to set
+-> route to 1 of the considered tile
+-> travel one of the considered tiles (?serach on the way?)
+-> remove from set
+-> repeat

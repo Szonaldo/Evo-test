@@ -2,10 +2,10 @@ import java.util.*;
 
 public class LawnMower {
     private int[] myPosition;
-    private String[][] myGarden;
+    private final String[][] myGarden;
     private GardenTileGraphNode[][] nodes;
-    private LinkedList<int[]> moveOptions;
-    private Set<String> pastMoves;
+    private final LinkedList<int[]> moveOptions;
+    private final Set<String> pastMoves;
 
     public void start() throws InterruptedException {
         pastMoves.add(vectorToString(myPosition));
@@ -19,15 +19,21 @@ public class LawnMower {
             move();
             updateVisit();
             count++;
-            Thread.sleep(200);
+            Thread.sleep(1000);
             System.out.println(count + " position: " + myPosition[0] + "," + myPosition[1]);
         }
 
 
     }
 
-    private void neighbourRoutingUpdate(int x, int y,GardenTileGraphNode innerTemp,GardenTileGraphNode goal, LinkedList<GardenTileGraphNode> queue,Set<GardenTileGraphNode> explored,GardenTileGraphNode end){
-        //queue.add(new GardenTileGraphNode(innerTemp.getX(), innerTemp.getY() - 1, true, innerTemp, myGarden ));
+    private void neighbourRoutingUpdate(int x,
+                                        int y,
+                                        GardenTileGraphNode innerTemp,
+                                        GardenTileGraphNode goal,
+                                        LinkedList<GardenTileGraphNode> queue,
+                                        Set<GardenTileGraphNode> explored,
+                                        GardenTileGraphNode end){
+
         nodes[x][y].setParent(innerTemp);
         if (explored.contains(innerTemp) || queue.contains(innerTemp)){
             if (goal.equalString(nodes[x][y].toString())){
@@ -40,12 +46,7 @@ public class LawnMower {
     }
 
     private LinkedList<int[]> getPath(GardenTileGraphNode goal){
-        /*
-        start myPositon;
-        taget: goal;
-        neighbours; : complicated
-        frontier: queue;
-        explored;*/
+
         GardenTileGraphNode currentPosition = nodes[myPosition[0]][myPosition[1]];
         LinkedList<int[]> result = new LinkedList<>();
         if (goal.equalString(currentPosition.toString())){
@@ -119,59 +120,6 @@ public class LawnMower {
         }
     }
 
-/*
-    private LinkedList<int[]> createRoute(int[] goal){ //todo
-
-
-        LinkedList<GardenTileGraphNode> queue = new LinkedList<>();// format "x,y,distance
-        Map<GardenTileGraphNode,GardenTileGraphNode> parentNodes;
-        LinkedList<int[]> result = new LinkedList<>();
-        GardenTileGraphNode current = new GardenTileGraphNode(myPosition[0],myPosition[1],0,true );
-
-        queue.add(current);
-        //visited.add(myPosition[0]+","+myPosition[1]);
-
-
-        while (queue.size() != 0){
-
-            current = queue.poll();
-            result.add(current.getArray());
-            if (current.getArray()[0] == goal[0] && current.getArray()[1] == goal[1]){
-                return result;
-            }
-
-            if (inBoundsLeft(current.getArray())
-                    && !nodes[current.getX()][current.getY() - 1].isVisited()
-                    && nodes[current.getX()][current.getY() - 1].isPassable()){
-                queue.add(new GardenTileGraphNode(current.getX(), current.getY() - 1, current.getDistance() + 1, true ));
-                nodes[current.getX()][current.getY() - 1].setVisited(true);
-            }
-            if (inBoundsUp(current.getArray())
-                    && !nodes[current.getX() - 1][current.getY()].isVisited()
-                    && nodes[current.getX() - 1][current.getY()].isPassable()){
-                queue.add(new GardenTileGraphNode(current.getX() - 1, current.getY(), current.getDistance() + 1, true));
-                nodes[current.getX() - 1][current.getY()].setVisited(true);
-            }
-            if (inBoundsRight(current.getArray())
-                    && !nodes[current.getX()][current.getY() + 1].isVisited()
-                    && nodes[current.getX()][current.getY() + 1].isPassable()) {
-                queue.add(new GardenTileGraphNode(current.getX(), current.getY() + 1, current.getDistance() + 1, true));
-                nodes[current.getX()][current.getY() + 1].setVisited(true);
-            }
-            if (inBoundsDown(current.getArray())
-                    && !nodes[current.getX() + 1][current.getY()].isVisited()
-                    && nodes[current.getX() + 1][current.getY()].isPassable()) {
-                queue.add(new GardenTileGraphNode(current.getX() + 1, current.getY(), current.getDistance() + 1, true));
-                nodes[current.getX() + 1][current.getY()].setVisited(true);
-            }
-
-        }
-
-
-        return null;
-    }
-*/
-
     private void goToNextValidState(int[] goal){
         System.out.println("Entered goToNextValidState()");
         LinkedList<int[]> route = getPath(nodes[goal[0]][goal[1]]);
@@ -181,17 +129,18 @@ public class LawnMower {
                 nodes[i][j].setParent(null);
             }
         }
+        assert route != null;
         for (int[] next : route) {
             myPosition = next;
             System.out.println(next.toString());
             for (int i = 0; i < myGarden.length; i++) {
                 for (int j = 0; j < myGarden[i].length; j++) {
                     if (myPosition[0] == i && myPosition[1] == j){
-                        System.out.printf("@");
+                        System.out.print("@");
                     } else if(pastMoves.contains(vectorToString(new int[]{i,j}))){
-                        System.out.printf(ANSI.RED+myGarden[i][j]+ANSI.RESET);
+                        System.out.print(ANSI.RED+myGarden[i][j]+ANSI.RESET);
                     } else {
-                        System.out.printf(ANSI.GREEN+myGarden[i][j]+ANSI.RESET);
+                        System.out.print(ANSI.GREEN+myGarden[i][j]+ANSI.RESET);
                     }
                 }
                 System.out.println();
@@ -206,11 +155,11 @@ public class LawnMower {
             for (int j = 0; j < myGarden[i].length; j++) {
 
                 if (myPosition[0] == i && myPosition[1] == j){
-                    System.out.printf("@");
+                    System.out.print("@");
                 } else if(pastMoves.contains(vectorToString(new int[]{i,j}))){
-                    System.out.printf(ANSI.RED+myGarden[i][j]+ANSI.RESET);
+                    System.out.print(ANSI.RED+myGarden[i][j]+ANSI.RESET);
                 } else {
-                    System.out.printf(ANSI.GREEN+myGarden[i][j]+ANSI.RESET);
+                    System.out.print(ANSI.GREEN+myGarden[i][j]+ANSI.RESET);
                 }
 
             }
@@ -219,10 +168,6 @@ public class LawnMower {
     }
 
     private void move() {
-        /*
-        myPosition = moveOptions.getLast();
-        moveOptions.removeLast();
-        pastMoves.add(vectorToString(myPosition));*/
 
         if (isNeighbour(moveOptions.getLast())) {
             myPosition = moveOptions.getLast();
@@ -250,16 +195,13 @@ public class LawnMower {
         return vector[0] + "," + vector[1];
     }
 
-    private boolean inBoundsUp(){return  myPosition[0] - 1 >= 0;}
+
     private boolean inBoundsUp(int[] pos){return  pos[0] - 1 >= 0;}
 
-    private boolean inBoundsRight(){return myPosition[1] + 1 < myGarden[myPosition[0]].length;}
     private boolean inBoundsRight(int[] pos){return pos[1] + 1 < myGarden[pos[0]].length;}
 
-    private boolean inBoundsDown(){return myPosition[0] + 1 < myGarden.length;}
     private boolean inBoundsDown(int[] pos){return pos[0] + 1 < myGarden.length;}
 
-    private boolean inBoundsLeft(){ return myPosition[1] - 1 >= 0;}
     private boolean inBoundsLeft(int[] pos){ return pos[1] - 1 >= 0;}
 
     private boolean linkedListStringContains(LinkedList<int[]> list, int[] position){

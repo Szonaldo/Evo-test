@@ -9,3 +9,18 @@ state:
 -> travel one of the considered tiles (?serach on the way?)
 -> remove from set
 -> repeat
+
+
+int[] arr = {10}
+int[] top = {arr[0],arr[1],arr[2]};
+for i = 0; top < top.len; i++ {
+    for(int j = i ; i< arr.len; j++ ){
+        if(top[i] < arr[j] ) {
+        csere()
+         break;}
+        }
+    }
+    }
+
+01234556
+012

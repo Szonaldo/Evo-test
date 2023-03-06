@@ -19,10 +19,55 @@ public class LawnMower {
             move();
             updateVisit();
             count++;
-            Thread.sleep(1000);
+            Thread.sleep(600);
             System.out.println(count + " position: " + myPosition[0] + "," + myPosition[1]);
         }
 
+
+    }
+
+    private void move() {
+
+        if (isNeighbour(moveOptions.getLast())) {
+            myPosition = moveOptions.getLast();
+            moveOptions.removeLast();
+            pastMoves.add(vectorToString(myPosition));
+            printCurrentState();
+        } else {
+            goToNextValidState(moveOptions.getLast());
+        }
+    }
+
+    private void updateVisit(){
+
+        int[] temp = (myPosition[1] - 1 >= 0) ? new int[]{ myPosition[0],myPosition[1] - 1} : new int[]{-1,-1};
+        boolean leftIsValid = myPosition[1] - 1 >= 0
+                && myGarden[temp[0]][temp[1]].equals("g")
+                && !pastMoves.contains(vectorToString(temp))
+                && linkedListStringContains(moveOptions,temp);
+        if (leftIsValid) moveOptions.add(temp);
+
+        temp = (myPosition[0] + 1 < myGarden.length) ? new int[] {myPosition[0] + 1,myPosition[1]} : new int[]{-1,-1};
+        boolean downIsValid = myPosition[0] + 1 < myGarden.length
+                && myGarden[temp[0]][temp[1]].equals("g")
+                && !pastMoves.contains(vectorToString(temp))
+                && linkedListStringContains(moveOptions, temp);
+        if (downIsValid) moveOptions.add(temp);
+
+        temp = (myPosition[1] + 1 < myGarden[myPosition[0]].length) ? new int[] {myPosition[0],myPosition[1] + 1} : new int[]{-1,-1};
+        boolean rightIsValid = myPosition[1] + 1 < myGarden[myPosition[0]].length
+                && myGarden[temp[0]][temp[1]].equals("g")
+                && !pastMoves.contains(vectorToString(temp))
+                && linkedListStringContains(moveOptions, temp);
+        if (rightIsValid) moveOptions.add(temp);
+
+
+        temp = (myPosition[0] - 1 >= 0) ? new int[] {myPosition[0] - 1,myPosition[1]} : new int[]{-1,-1};
+        boolean upIsValid = myPosition[0] - 1 >= 0
+                && myGarden[temp[0]][temp[1]].equals("g")
+                && !pastMoves.contains(vectorToString(temp))
+                && linkedListStringContains(moveOptions, temp);
+        if (upIsValid) moveOptions.add(temp);
 
     }
 
@@ -121,7 +166,7 @@ public class LawnMower {
     }
 
     private void goToNextValidState(int[] goal){
-        System.out.println("Entered goToNextValidState()");
+        System.out.println();
         LinkedList<int[]> route = getPath(nodes[goal[0]][goal[1]]);
         for (int i = 0; i < nodes.length; i++) {
             for (int j = 0; j < nodes[i].length; j++) {
@@ -132,7 +177,7 @@ public class LawnMower {
         assert route != null;
         for (int[] next : route) {
             myPosition = next;
-            System.out.println(next.toString());
+            System.out.println(myPosition[0] +"," +myPosition[1]);
             for (int i = 0; i < myGarden.length; i++) {
                 for (int j = 0; j < myGarden[i].length; j++) {
                     if (myPosition[0] == i && myPosition[1] == j){
@@ -149,7 +194,7 @@ public class LawnMower {
     }
 
     private void printCurrentState(){
-        System.out.println("Entered printCurrentState()");
+        System.out.println();
         for (int i = 0; i <myGarden.length; i++) {
 
             for (int j = 0; j < myGarden[i].length; j++) {
@@ -167,17 +212,7 @@ public class LawnMower {
         }
     }
 
-    private void move() {
 
-        if (isNeighbour(moveOptions.getLast())) {
-            myPosition = moveOptions.getLast();
-            moveOptions.removeLast();
-            pastMoves.add(vectorToString(myPosition));
-            printCurrentState();
-        } else {
-            goToNextValidState(moveOptions.getLast());
-        }
-    }
     private int[] deltaPosition(int[] currentPos, int[] goalPos){
         return new int[] {currentPos[0] - goalPos[0], currentPos[1] - goalPos[1]};
         //return new int[] {myPosition[0] - myOptions.getLast()[0], myPosition[1] - myOptions.getLast()[0]};
@@ -210,40 +245,7 @@ public class LawnMower {
         }
         return true;
     }
-
     //check 4 direction for possible tiles to step on, also add them to relevant stack
-    private void updateVisit(){
-
-        int[] temp = (myPosition[1] - 1 >= 0) ? new int[]{ myPosition[0],myPosition[1] - 1} : new int[]{-1,-1};
-        boolean leftIsValid = myPosition[1] - 1 >= 0
-                && myGarden[temp[0]][temp[1]].equals("g")
-                && !pastMoves.contains(vectorToString(temp))
-                && linkedListStringContains(moveOptions,temp);
-        if (leftIsValid) moveOptions.add(temp);
-
-        temp = (myPosition[0] + 1 < myGarden.length) ? new int[] {myPosition[0] + 1,myPosition[1]} : new int[]{-1,-1};
-        boolean downIsValid = myPosition[0] + 1 < myGarden.length
-                && myGarden[temp[0]][temp[1]].equals("g")
-                && !pastMoves.contains(vectorToString(temp))
-                && linkedListStringContains(moveOptions, temp);
-        if (downIsValid) moveOptions.add(temp);
-
-        temp = (myPosition[1] + 1 < myGarden[myPosition[0]].length) ? new int[] {myPosition[0],myPosition[1] + 1} : new int[]{-1,-1};
-        boolean rightIsValid = myPosition[1] + 1 < myGarden[myPosition[0]].length
-                && myGarden[temp[0]][temp[1]].equals("g")
-                && !pastMoves.contains(vectorToString(temp))
-                && linkedListStringContains(moveOptions, temp);
-        if (rightIsValid) moveOptions.add(temp);
-
-
-        temp = (myPosition[0] - 1 >= 0) ? new int[] {myPosition[0] - 1,myPosition[1]} : new int[]{-1,-1};
-        boolean upIsValid = myPosition[0] - 1 >= 0
-                && myGarden[temp[0]][temp[1]].equals("g")
-                && !pastMoves.contains(vectorToString(temp))
-                && linkedListStringContains(moveOptions, temp);
-        if (upIsValid) moveOptions.add(temp);
-
-    }
 
 
     //constructors
@@ -252,8 +254,8 @@ public class LawnMower {
         myGarden = new String[][] {
                 {"g","g","g","o","g"},
                 {"g","g","g","o","g"},
-                {"g","g","g","g","g"},
-                {"g","g","g","g","g"},
+                {"o","g","g","g","g"},
+                {"g","o","g","g","o"},
                 {"g","g","g","g","g"}
         };
         nodes = new GardenTileGraphNode[myGarden.length][myGarden[0].length];
